@@ -1,0 +1,107 @@
+[
+{
+  "id": 1,
+  "type": "PassengerTransport",
+  "date": "2025-12-25",
+  "destination": "Sofia",
+  "price": 600.00,
+  "paymentStatus": "PAID",
+  "driver": {
+    "id": 2,
+    "name": "Elena Stoyanova"
+  },
+  "vehicle": {
+    "id": 1,
+    "registrationNumber": "CA7777TT"
+  },
+  "client": {
+    "id": 1,
+    "name": "Maria Georgieva"
+  }
+}
+,
+{
+  "id": 2,
+  "type": "CargoTransport",
+  "date": "2025-12-27",
+  "destination": "Varna",
+  "price": 2500.00,
+  "paymentStatus": "UNPAID",
+  "driver": {
+    "id": 1,
+    "name": "Daniel Kolev"
+  },
+  "vehicle": {
+    "id": 2,
+    "registrationNumber": "PB9090PP"
+  },
+  "client": {
+    "id": 2,
+    "name": "Hristo Kostov"
+  }
+}
+,
+{
+  "id": 3,
+  "type": "CargoTransport",
+  "date": "2025-12-18",
+  "destination": "Burgas",
+  "price": 1100.00,
+  "paymentStatus": "PAID",
+  "driver": {
+    "id": 3,
+    "name": "Radoslav Dimitrov"
+  },
+  "vehicle": {
+    "id": 3,
+    "registrationNumber": "CB3333KK"
+  },
+  "client": {
+    "id": 3,
+    "name": "Nikolay Petkov"
+  }
+}
+,
+{
+  "id": 4,
+  "type": "CargoTransport",
+  "date": "2025-12-26",
+  "destination": "Ruse",
+  "price": 900.00,
+  "paymentStatus": "UNPAID",
+  "driver": {
+    "id": 3,
+    "name": "Radoslav Dimitrov"
+  },
+  "vehicle": {
+    "id": 4,
+    "registrationNumber": "CB4444LL"
+  },
+  "client": {
+    "id": 3,
+    "name": "Nikolay Petkov"
+  }
+}
+,
+{
+  "id": 5,
+  "type": "PassengerTransport",
+  "date": "2025-12-23",
+  "destination": "Plovdiv",
+  "price": 450.00,
+  "paymentStatus": "UNPAID",
+  "driver": {
+    "id": 5,
+    "name": "Yordan Ivanov"
+  },
+  "vehicle": {
+    "id": 5,
+    "registrationNumber": "CA1010AA"
+  },
+  "client": {
+    "id": 4,
+    "name": "Stefan Iliev"
+  }
+}
+
+]
