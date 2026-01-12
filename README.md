@@ -44,7 +44,7 @@ A Java-based transport company management system using OOP principles, Hibernate
 
    Edit `src/main/resources/hibernate.properties`:
 ```properties
-   hibernate.connection.username=root
+   hibernate.connection.username=YOUR_USERNAME
    hibernate.connection.password=YOUR_PASSWORD
 ```
 
