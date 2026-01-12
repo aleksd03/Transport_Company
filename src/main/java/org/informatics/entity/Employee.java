@@ -6,6 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * Base class for all employees working in a transport company.
+ * Uses JOINED inheritance strategy - each subclass has its own table.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

@@ -9,7 +9,47 @@ repositories {
     mavenCentral()
 }
 
+// ===================== SOURCE SETS =====================
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+
+    test {
+        java {
+            srcDirs = ['src/test/java']
+        }
+        resources {
+            srcDirs = ['src/test/resources']
+        }
+    }
+
+    integrationTest {
+        java {
+            srcDir file('src/integrationTest/java')
+        }
+        resources {
+            srcDir file('src/integrationTest/resources')
+        }
+        compileClasspath += sourceSets.main.output + configurations.testCompileClasspath
+        runtimeClasspath += output + compileClasspath + configurations.testRuntimeClasspath
+    }
+}
+
+// ===================== CONFIGURATIONS =====================
+configurations {
+    integrationTestImplementation.extendsFrom implementation
+    integrationTestRuntimeOnly.extendsFrom runtimeOnly
+}
+
+// ===================== DEPENDENCIES =====================
 dependencies {
+    // Hibernate & MySQL
     implementation("org.hibernate.orm:hibernate-core:7.1.0.Final")
     implementation("com.mysql:mysql-connector-j:9.4.0")
     implementation("org.apache.logging.log4j:log4j-core:2.23.1")
@@ -19,50 +59,66 @@ dependencies {
 
     annotationProcessor("org.hibernate.orm:hibernate-processor:7.1.0.Final")
 
+    // Lombok
     compileOnly("org.projectlombok:lombok:1.18.38")
     annotationProcessor("org.projectlombok:lombok:1.18.38")
 
+    // JUnit 5 for unit tests
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Mockito for unit tests
+    testImplementation 'org.mockito:mockito-core:5.8.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.8.0'
+
+    // H2 for unit tests (in-memory database)
+    testImplementation 'com.h2database:h2:2.2.224'
+
+    // Integration tests inherit all test dependencies
+    integrationTestImplementation platform('org.junit:junit-bom:5.10.0')
+    integrationTestImplementation 'org.junit.jupiter:junit-jupiter'
+    integrationTestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+// ===================== TASKS =====================
+
+// Unit tests task
 test {
     useJUnitPlatform()
     systemProperty 'hibernate.props', 'hibernate-unit.properties'
-}
 
-sourceSets {
-    integrationTest {
-        java {
-            srcDir file('src/integrationTest/java')
-        }
-        resources {
-            srcDir file('src/integrationTest/resources')
-        }
-        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
-        runtimeClasspath += output + compileClasspath
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = false
     }
 }
 
-configurations {
-    integrationTestImplementation.extendsFrom testImplementation
-    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+// Integration tests task
+tasks.register('integrationTest', Test) {
+    description = 'Runs integration tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+
+    useJUnitPlatform()
+    shouldRunAfter test
+
+    systemProperty 'hibernate.props', 'hibernate-integration.properties'
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
 }
 
+// Duplicates strategy
 tasks.named('processIntegrationTestResources') {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-tasks.register('integrationTest', Test) {
-    description = 'Runs integration tests.'
-    group = 'verification'
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-    useJUnitPlatform()
-    shouldRunAfter tasks.test
-
-    systemProperty 'hibernate.props', 'hibernate-integration.properties'
-}
-
-check.dependsOn tasks.named('integrationTest')
+// Make 'check' run both unit and integration tests
+check.dependsOn integrationTest

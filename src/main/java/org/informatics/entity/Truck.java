@@ -6,6 +6,9 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Represents a truck vehicle used for cargo transport.
+ */
 @Getter
 @Setter
 @Entity

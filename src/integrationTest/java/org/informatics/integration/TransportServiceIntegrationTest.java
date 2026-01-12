@@ -1,3 +1,5 @@
+package org.informatics.integration;
+
 import org.informatics.dao.*;
 import org.informatics.entity.*;
 import org.informatics.entity.enums.DriverQualification;
@@ -5,18 +7,21 @@ import org.informatics.entity.enums.PaymentStatus;
 import org.informatics.exception.DriverQualificationException;
 import org.informatics.exception.InvalidVehicleForTransportException;
 import org.informatics.service.TransportService;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TransportServiceTest {
-    @Test
-    void passengerTransport_over12_withoutQualification_shouldThrow() {
-        TransportCompany company = createCompany("TestCo A");
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+class TransportServiceIntegrationTest {
 
-        Client client = createClient("Ivan", "Petrov", "0888000001");
+    @Test
+    @Order(1)
+    void passengerTransport_over12_withoutQualification_shouldThrow() {
+        // Arrange - Create test data
+        TransportCompany company = createCompany("TestCo A - " + System.currentTimeMillis());
+        Client client = createClient("Ivan", "Petrov", "0888" + System.currentTimeMillis() % 1000000);
 
         Driver driver = new Driver();
         driver.setFirstName("No");
@@ -26,13 +31,14 @@ public class TransportServiceTest {
         EmployeeDao.create(driver);
 
         Bus bus = new Bus();
-        bus.setRegistrationNumber("TEST-BUS-001");
+        bus.setRegistrationNumber("TEST-BUS-" + System.currentTimeMillis() % 10000);
         bus.setBrand("Brand");
         bus.setModel("Model");
         bus.setSeats(50);
         bus.setCompany(company);
         VehicleDao.create(bus);
 
+        // Arrange - Create passenger transport with > 12 passengers
         PassengerTransport pt = new PassengerTransport();
         pt.setCompany(company);
         pt.setClient(client);
@@ -42,15 +48,20 @@ public class TransportServiceTest {
         pt.setTransportDate(LocalDate.now());
         pt.setPrice(100);
         pt.setPaymentStatus(PaymentStatus.UNPAID);
-        pt.setPassengerCount(20);
+        pt.setPassengerCount(20); // Over 12, but driver has no qualification
 
-        assertThrows(DriverQualificationException.class, () -> TransportService.createTransport(pt));
+        // Act & Assert - Should throw exception
+        assertThrows(DriverQualificationException.class,
+                () -> TransportService.createTransport(pt),
+                "Driver without PASSENGERS_OVER_12 qualification should not transport > 12 passengers");
     }
 
     @Test
+    @Order(2)
     void passengerTransport_withTruck_shouldThrow() {
-        TransportCompany company = createCompany("TestCo B");
-        Client client = createClient("Maria", "Ivanova", "0888000002");
+        // Arrange - Create test data
+        TransportCompany company = createCompany("TestCo B - " + System.currentTimeMillis());
+        Client client = createClient("Maria", "Ivanova", "0888" + System.currentTimeMillis() % 1000000);
 
         Driver driver = new Driver();
         driver.setFirstName("Passenger");
@@ -61,49 +72,56 @@ public class TransportServiceTest {
         EmployeeDao.create(driver);
 
         Truck truck = new Truck();
-        truck.setRegistrationNumber("TEST-TRK-001");
+        truck.setRegistrationNumber("TEST-TRK-" + System.currentTimeMillis() % 10000);
         truck.setBrand("Brand");
         truck.setModel("Model");
         truck.setMaxLoadKg(10000);
         truck.setCompany(company);
         VehicleDao.create(truck);
 
+        // Arrange - Create passenger transport with wrong vehicle type
         PassengerTransport pt = new PassengerTransport();
         pt.setCompany(company);
         pt.setClient(client);
         pt.setDriver(driver);
-        pt.setVehicle(truck); // invalid
+        pt.setVehicle(truck); // Wrong: should be Bus
         pt.setDestination("Plovdiv");
         pt.setTransportDate(LocalDate.now());
         pt.setPrice(100);
         pt.setPaymentStatus(PaymentStatus.UNPAID);
         pt.setPassengerCount(20);
 
-        assertThrows(InvalidVehicleForTransportException.class, () -> TransportService.createTransport(pt));
+        // Act & Assert - Should throw exception
+        assertThrows(InvalidVehicleForTransportException.class,
+                () -> TransportService.createTransport(pt),
+                "PassengerTransport must use a Bus, not a Truck");
     }
 
     @Test
+    @Order(3)
     void cargoTransport_flammableTanker_withoutSpecialCargo_shouldThrow() {
-        TransportCompany company = createCompany("TestCo C");
-        Client client = createClient("Niki", "Petkov", "0888000003");
+        // Arrange - Create test data
+        TransportCompany company = createCompany("TestCo C - " + System.currentTimeMillis());
+        Client client = createClient("Niki", "Petkov", "0888" + System.currentTimeMillis() % 1000000);
 
         Driver driver = new Driver();
         driver.setFirstName("Cargo");
         driver.setLastName("Driver");
         driver.setSalary(1500);
         driver.setCompany(company);
-        // no SPECIAL_CARGO
+        // No SPECIAL_CARGO qualification
         EmployeeDao.create(driver);
 
         Tanker tanker = new Tanker();
-        tanker.setRegistrationNumber("TEST-TNK-001");
+        tanker.setRegistrationNumber("TEST-TNK-" + System.currentTimeMillis() % 10000);
         tanker.setBrand("Brand");
         tanker.setModel("Model");
         tanker.setMaxLiters(10000);
-        tanker.setFlammable(true);
+        tanker.setFlammable(true); // Flammable cargo
         tanker.setCompany(company);
         VehicleDao.create(tanker);
 
+        // Arrange - Create cargo transport with flammable tanker
         CargoTransport ct = new CargoTransport();
         ct.setCompany(company);
         ct.setClient(client);
@@ -115,13 +133,18 @@ public class TransportServiceTest {
         ct.setPaymentStatus(PaymentStatus.UNPAID);
         ct.setCargoWeightKg(1000);
 
-        assertThrows(DriverQualificationException.class, () -> TransportService.createTransport(ct));
+        // Act & Assert - Should throw exception
+        assertThrows(DriverQualificationException.class,
+                () -> TransportService.createTransport(ct),
+                "Driver without SPECIAL_CARGO qualification should not transport flammable cargo");
     }
 
     @Test
+    @Order(4)
     void cargoTransport_truck_shouldPass() {
-        TransportCompany company = createCompany("TestCo D");
-        Client client = createClient("Stefan", "Iliev", "0888000004");
+        // Arrange - Create test data
+        TransportCompany company = createCompany("TestCo D - " + System.currentTimeMillis());
+        Client client = createClient("Stefan", "Iliev", "0888" + System.currentTimeMillis() % 1000000);
 
         Driver driver = new Driver();
         driver.setFirstName("Truck");
@@ -131,13 +154,14 @@ public class TransportServiceTest {
         EmployeeDao.create(driver);
 
         Truck truck = new Truck();
-        truck.setRegistrationNumber("TEST-TRK-002");
+        truck.setRegistrationNumber("TEST-TRK-" + System.currentTimeMillis() % 10000);
         truck.setBrand("Brand");
         truck.setModel("Model");
         truck.setMaxLoadKg(10000);
         truck.setCompany(company);
         VehicleDao.create(truck);
 
+        // Arrange - Create valid cargo transport
         CargoTransport ct = new CargoTransport();
         ct.setCompany(company);
         ct.setClient(client);
@@ -149,13 +173,17 @@ public class TransportServiceTest {
         ct.setPaymentStatus(PaymentStatus.PAID);
         ct.setCargoWeightKg(2000);
 
-        assertDoesNotThrow(() -> TransportService.createTransport(ct));
+        // Act & Assert - Should NOT throw exception
+        assertDoesNotThrow(() -> TransportService.createTransport(ct),
+                "Valid cargo transport with truck should be created successfully");
     }
 
     @Test
+    @Order(5)
     void passengerTransport_over12_withQualification_shouldPass() {
-        TransportCompany company = createCompany("HappyCo A");
-        Client client = createClient("Ana", "Nikolova", "0888000101");
+        // Arrange - Create test data
+        TransportCompany company = createCompany("HappyCo A - " + System.currentTimeMillis());
+        Client client = createClient("Ana", "Nikolova", "0888" + System.currentTimeMillis() % 1000000);
 
         Driver driver = new Driver();
         driver.setFirstName("Qualified");
@@ -166,13 +194,14 @@ public class TransportServiceTest {
         EmployeeDao.create(driver);
 
         Bus bus = new Bus();
-        bus.setRegistrationNumber("HP-BUS-100");
+        bus.setRegistrationNumber("HP-BUS-" + System.currentTimeMillis() % 10000);
         bus.setBrand("Setra");
         bus.setModel("Demo");
         bus.setSeats(50);
         bus.setCompany(company);
         VehicleDao.create(bus);
 
+        // Arrange - Create valid passenger transport
         PassengerTransport pt = new PassengerTransport();
         pt.setCompany(company);
         pt.setClient(client);
@@ -182,15 +211,19 @@ public class TransportServiceTest {
         pt.setTransportDate(LocalDate.now());
         pt.setPrice(200);
         pt.setPaymentStatus(PaymentStatus.UNPAID);
-        pt.setPassengerCount(20);
+        pt.setPassengerCount(20); // Over 12, but driver HAS qualification
 
-        assertDoesNotThrow(() -> TransportService.createTransport(pt));
+        // Act & Assert - Should NOT throw exception
+        assertDoesNotThrow(() -> TransportService.createTransport(pt),
+                "Qualified driver should be able to transport > 12 passengers");
     }
 
     @Test
+    @Order(6)
     void cargoTransport_flammableTanker_withSpecialCargo_shouldPass() {
-        TransportCompany company = createCompany("HappyCo B");
-        Client client = createClient("Viktor", "Marinov", "0888000102");
+        // Arrange - Create test data
+        TransportCompany company = createCompany("HappyCo B - " + System.currentTimeMillis());
+        Client client = createClient("Viktor", "Marinov", "0888" + System.currentTimeMillis() % 1000000);
 
         Driver driver = new Driver();
         driver.setFirstName("Qualified");
@@ -201,7 +234,7 @@ public class TransportServiceTest {
         EmployeeDao.create(driver);
 
         Tanker tanker = new Tanker();
-        tanker.setRegistrationNumber("HP-TNK-100");
+        tanker.setRegistrationNumber("HP-TNK-" + System.currentTimeMillis() % 10000);
         tanker.setBrand("MAN");
         tanker.setModel("Demo");
         tanker.setMaxLiters(10000);
@@ -209,6 +242,7 @@ public class TransportServiceTest {
         tanker.setCompany(company);
         VehicleDao.create(tanker);
 
+        // Arrange - Create valid flammable cargo transport
         CargoTransport ct = new CargoTransport();
         ct.setCompany(company);
         ct.setClient(client);
@@ -220,29 +254,42 @@ public class TransportServiceTest {
         ct.setPaymentStatus(PaymentStatus.PAID);
         ct.setCargoWeightKg(3000);
 
-        assertDoesNotThrow(() -> TransportService.createTransport(ct));
+        // Act & Assert - Should NOT throw exception
+        assertDoesNotThrow(() -> TransportService.createTransport(ct),
+                "Qualified driver should be able to transport flammable cargo");
     }
 
-    // ---------- helpers ----------
+    // ========== HELPER METHODS ==========
+
+    /**
+     * Creates and persists a TransportCompany with the given name.
+     * Returns the persisted company entity.
+     */
     private static TransportCompany createCompany(String name) {
         TransportCompany c = new TransportCompany();
         c.setName(name);
         TransportCompanyDao.create(c);
+
         return TransportCompanyDao.getAll().stream()
                 .filter(x -> x.getName().equals(name))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("Failed to create company: " + name));
     }
 
+    /**
+     * Creates and persists a Client with the given details.
+     * Returns the persisted client entity.
+     */
     private static Client createClient(String firstName, String lastName, String phone) {
         Client client = new Client();
         client.setFirstName(firstName);
         client.setLastName(lastName);
         client.setPhone(phone);
         ClientDao.create(client);
+
         return ClientDao.getAll().stream()
                 .filter(x -> phone.equals(x.getPhone()))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("Failed to create client: " + phone));
     }
 }

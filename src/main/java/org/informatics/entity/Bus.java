@@ -6,6 +6,9 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Represents a bus vehicle used for passenger transport.
+ */
 @Getter
 @Setter
 @Entity

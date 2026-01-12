@@ -6,6 +6,10 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Represents a transport operation for cargo.
+ * Must use a Truck or Tanker. If using flammable Tanker, driver must have SPECIAL_CARGO qualification.
+ */
 @Getter
 @Setter
 @Entity

@@ -8,6 +8,11 @@ import org.informatics.entity.enums.PaymentStatus;
 
 import java.time.LocalDate;
 
+/**
+ * Base class for all transport operations.
+ * Uses JOINED inheritance strategy - each transport type has its own table.
+ * Transport represents a single service performed by the company.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

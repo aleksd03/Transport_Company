@@ -9,16 +9,30 @@ import org.informatics.entity.*;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * Utility class for managing Hibernate SessionFactory.
+ * Provides a singleton SessionFactory instance configured from properties files.
+ *
+ * Different properties files can be loaded based on the system property "hibernate.properties":
+ * - hibernate.properties (default for main application)
+ * - hibernate-unit.properties (for unit tests)
+ * - hibernate-integration.properties (for integration tests)
+ */
 public class SessionFactoryUtil {
     private static SessionFactory sessionFactory;
 
+    /**
+     * Returns the singleton SessionFactory instance.
+     * Creates the SessionFactory on first access using the configured properties file.
+     *
+     * @return the Hibernate SessionFactory
+     * @throws RuntimeException if properties file cannot be loaded
+     */
     public static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
             Configuration configuration = new Configuration();
 
-            // Choose which properties file to load:
-            // - default: hibernate.properties (main)
-            // - tests can override via: -Dhibernate.props=hibernate-unit.properties / hibernate-integration.properties
+            // Load properties file based on system property (for test configuration)
             String propsFile = System.getProperty("hibernate.props", "hibernate.properties");
 
             Properties props = new Properties();
@@ -33,7 +47,7 @@ public class SessionFactoryUtil {
 
             configuration.setProperties(props);
 
-            // Register entities
+            // Register all entity classes
             configuration.addAnnotatedClass(TransportCompany.class);
             configuration.addAnnotatedClass(Client.class);
             configuration.addAnnotatedClass(Employee.class);
@@ -53,5 +67,16 @@ public class SessionFactoryUtil {
             sessionFactory = configuration.buildSessionFactory(serviceRegistry);
         }
         return sessionFactory;
+    }
+
+    /**
+     * Closes the SessionFactory and releases all resources.
+     * Used primarily for cleanup in test environments.
+     */
+    public static void closeSessionFactory() {
+        if (sessionFactory != null && !sessionFactory.isClosed()) {
+            sessionFactory.close();
+            sessionFactory = null;
+        }
     }
 }

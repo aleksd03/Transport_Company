@@ -6,6 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * Base class for all vehicles owned by a transport company.
+ * Uses JOINED inheritance strategy - each vehicle type has its own table.
+ */
 @Getter
 @Setter
 @Entity

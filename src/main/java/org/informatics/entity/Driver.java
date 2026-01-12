@@ -10,6 +10,10 @@ import org.informatics.entity.enums.DriverQualification;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Represents a driver who can perform transports.
+ * Drivers have qualifications that determine what types of transports they can perform.
+ */
 @Getter
 @Setter
 @Entity

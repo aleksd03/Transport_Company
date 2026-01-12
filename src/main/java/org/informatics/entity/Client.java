@@ -6,6 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * Represents a client who requests transport services.
+ * Clients can have multiple transports associated with them.
+ */
 @Entity
 @NoArgsConstructor
 @Getter

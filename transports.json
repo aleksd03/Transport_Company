@@ -2,7 +2,7 @@
 {
   "id": 1,
   "type": "PassengerTransport",
-  "date": "2025-12-25",
+  "date": "2026-01-10",
   "destination": "Sofia",
   "price": 600.00,
   "paymentStatus": "PAID",
@@ -23,7 +23,7 @@
 {
   "id": 2,
   "type": "CargoTransport",
-  "date": "2025-12-27",
+  "date": "2026-01-12",
   "destination": "Varna",
   "price": 2500.00,
   "paymentStatus": "UNPAID",
@@ -44,7 +44,7 @@
 {
   "id": 3,
   "type": "CargoTransport",
-  "date": "2025-12-18",
+  "date": "2026-01-03",
   "destination": "Burgas",
   "price": 1100.00,
   "paymentStatus": "PAID",
@@ -65,7 +65,7 @@
 {
   "id": 4,
   "type": "CargoTransport",
-  "date": "2025-12-26",
+  "date": "2026-01-11",
   "destination": "Ruse",
   "price": 900.00,
   "paymentStatus": "UNPAID",
@@ -86,7 +86,7 @@
 {
   "id": 5,
   "type": "PassengerTransport",
-  "date": "2025-12-23",
+  "date": "2026-01-08",
   "destination": "Plovdiv",
   "price": 450.00,
   "paymentStatus": "UNPAID",

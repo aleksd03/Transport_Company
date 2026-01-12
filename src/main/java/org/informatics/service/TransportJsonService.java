@@ -10,16 +10,28 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service for exporting and reading transport data in JSON format.
+ */
 public class TransportJsonService {
 
+    /**
+     * Exports all transports from the database to a JSON file.
+     *
+     * @param filePath path where the JSON file will be created
+     * @throws RuntimeException if file writing fails
+     */
     public static void exportToJson(String filePath) {
+        // Fetch all transports and convert to DTOs
         List<TransportJsonDto> dtos = TransportDao.getAll()
                 .stream()
                 .map(TransportJsonService::toDto)
                 .collect(Collectors.toList());
 
+        // Convert to JSON string
         String json = toJsonArray(dtos);
 
+        // Write to file
         try {
             Files.writeString(Path.of(filePath), json);
         } catch (IOException e) {
@@ -27,6 +39,13 @@ public class TransportJsonService {
         }
     }
 
+    /**
+     * Reads JSON content from a file.
+     *
+     * @param filePath path to the JSON file
+     * @return JSON content as string
+     * @throws RuntimeException if file reading fails
+     */
     public static String readJson(String filePath) {
         try {
             return Files.readString(Path.of(filePath));
@@ -35,8 +54,11 @@ public class TransportJsonService {
         }
     }
 
-    // ===================== helpers =====================
+    // ===================== PRIVATE HELPER METHODS =====================
 
+    /**
+     * Converts a Transport entity to a TransportJsonDto.
+     */
     private static TransportJsonDto toDto(Transport t) {
         return new TransportJsonDto(
                 t.getId(),
@@ -54,12 +76,18 @@ public class TransportJsonService {
         );
     }
 
+    /**
+     * Converts a list of DTOs to a JSON array string.
+     */
     private static String toJsonArray(List<TransportJsonDto> list) {
         return list.stream()
                 .map(TransportJsonService::toJsonObject)
                 .collect(Collectors.joining(",\n", "[\n", "\n]"));
     }
 
+    /**
+     * Converts a single DTO to a JSON object string.
+     */
     private static String toJsonObject(TransportJsonDto d) {
         return """
                 {
@@ -98,6 +126,9 @@ public class TransportJsonService {
         );
     }
 
+    /**
+     * Escapes quotes in strings for JSON safety.
+     */
     private static String safe(String s) {
         return s == null ? "" : s.replace("\"", "'");
     }

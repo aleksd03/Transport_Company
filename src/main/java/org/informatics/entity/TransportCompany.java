@@ -5,6 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Represents a transport company that owns vehicles and employs drivers.
+ * A company can have multiple employees, vehicles, and transports.
+ */
 @Entity
 @NoArgsConstructor
 @Getter
