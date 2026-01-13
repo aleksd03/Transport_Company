@@ -71,7 +71,7 @@ class ReportDaoIntegrationTest {
                 .findFirst().orElseThrow();
         Bus bus = (Bus) VehicleDao.get(busId);
 
-        // ✅ Get revenue BEFORE adding new transports
+        // Get revenue BEFORE adding new transports
         double revenueBefore = ReportDao.getTotalTransportsRevenue();
 
         // PAID transport
@@ -100,10 +100,10 @@ class ReportDaoIntegrationTest {
         unpaid.setPassengerCount(20);
         TransportService.createTransport(unpaid);
 
-        // ✅ Get revenue AFTER
+        // Get revenue AFTER
         double revenueAfter = ReportDao.getTotalTransportsRevenue();
 
-        // ✅ Revenue should INCREASE by 100 (only PAID transport)
+        // Revenue should INCREASE by 100 (only PAID transport)
         assertEquals(revenueBefore + 100.0, revenueAfter, 0.0001,
                 "Revenue should increase by 100 (only PAID transport counted)");
 
