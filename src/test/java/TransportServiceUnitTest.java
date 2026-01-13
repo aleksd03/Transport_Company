@@ -40,10 +40,6 @@ class TransportServiceUnitTest {
 
         // Act & Assert - should NOT throw
         assertDoesNotThrow(() -> {
-            // Call private validateTransport via reflection OR extract to public method
-            // For now, we'll call createTransport but mock the DAO
-            // Since we can't easily mock static methods without PowerMock,
-            // we'll test the validation logic directly
             validatePassengerTransport(pt);
         });
     }
